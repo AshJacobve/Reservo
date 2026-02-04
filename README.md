@@ -34,6 +34,7 @@ A comprehensive web-based resource booking and management platform built with Ne
 - Add purpose/notes to bookings
 - Instant booking confirmation
 
+<img width="2842" height="1493" alt="Screenshot 2026-02-03 225521" src="https://github.com/user-attachments/assets/6bd717a8-248a-4906-94e4-898d4faa4a67" />
 
 ####  **User Dashboard**
 - View all your bookings in one place
@@ -42,7 +43,7 @@ A comprehensive web-based resource booking and management platform built with Ne
 - Filter between upcoming and past bookings
 - Detailed booking information cards
 - 
-<img width="2855" height="1504" alt="Screenshot 2026-02-03 225546" src="https://github.com/user-attachments/assets/ca32a354-d6b3-46cc-b186-9264b6ae3a51" />
+
 
 
 ####  **Profile Management**
@@ -52,7 +53,7 @@ A comprehensive web-based resource booking and management platform built with Ne
 
 ### For Administrators
 
-<img width="2828" height="1506" alt="Screenshot 2026-02-03 225558" src="https://github.com/user-attachments/assets/d9477769-f6fe-4f3f-b94a-7c2b074d036e" />
+<img width="2855" height="1504" alt="Screenshot 2026-02-03 225546" src="https://github.com/user-attachments/assets/ca32a354-d6b3-46cc-b186-9264b6ae3a51" />
 
 
 ####  **Admin Dashboard**
@@ -78,6 +79,7 @@ A comprehensive web-based resource booking and management platform built with Ne
 - Configure booking rules
 - Manage resource categories
 
+<img width="2828" height="1506" alt="Screenshot 2026-02-03 225558" src="https://github.com/user-attachments/assets/d9477769-f6fe-4f3f-b94a-7c2b074d036e" />
 
 #### **User Management**
 - View all registered users
