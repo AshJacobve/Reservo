@@ -1,36 +1,327 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Reservo - Resource Booking & Management System
 
-## Getting Started
+A comprehensive web-based resource booking and management platform built with Next.js, Firebase, and modern UI components. This system enables organizations to efficiently manage resource reservations with role-based access control.
 
-First, run the development server:
+![Reservo Banner](./screenshots/hero.png)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 📋 Table of Contents
+
+- [Overview](#overview)
+- [Key Features](#key-features)
+- [Screenshots](#screenshots)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+- [Project Structure](#project-structure)
+- [User Roles](#user-roles)
+- [Deployment](#deployment)
+
+## 🎯 Overview
+
+**Reservo** is a full-stack booking management system designed for educational institutions, organizations, or any entity that needs to manage shared resources. The platform features separate interfaces for administrators and regular users, providing comprehensive booking management, real-time availability checking, and detailed analytics.
+
+### What Can You Do?
+
+- **Book Resources**: Reserve facilities, equipment, or rooms with an intuitive calendar interface
+- **Real-Time Availability**: Check available time slots instantly before making a booking
+- **Booking Management**: Track, modify, and cancel your reservations
+- **Admin Dashboard**: Comprehensive administrative controls for managing all bookings and resources
+- **Analytics & Statistics**: Visualize booking trends and resource utilization
+- **Announcements**: System-wide notifications for users
+- **Role-Based Access**: Separate dashboards for administrators and regular users
+
+## ✨ Key Features
+
+### For Users
+
+#### 🗓️ **Interactive Scheduler**
+- Visual calendar interface for booking resources
+- Real-time availability checking
+- Select time slots (9 AM - 5 PM in 1-hour intervals)
+- Add purpose/notes to bookings
+- Instant booking confirmation
+
+![Scheduler Interface](./screenshots/scheduler.png)
+
+#### 📊 **User Dashboard**
+- View all your bookings in one place
+- Track booking status (pending, accepted, rejected, cancelled)
+- Cancel bookings when needed
+- Filter between upcoming and past bookings
+- Detailed booking information cards
+
+![User Dashboard](./screenshots/user-dashboard.png)
+
+#### 👤 **Profile Management**
+- Update personal information
+- View account details
+- Manage contact preferences
+
+### For Administrators
+
+#### 📈 **Admin Dashboard**
+- Overview of all bookings with statistics
+- Interactive charts showing booking trends
+- Recent bookings at a glance
+- Quick access to key metrics
+- Real-time data visualization
+
+![Admin Dashboard](./screenshots/admin-dashboard.png)
+
+#### ✅ **Booking Management**
+- Approve or reject booking requests
+- View detailed booking information
+- Filter and search bookings
+- Manage booking statuses
+- Export booking data
+
+![Booking Management](./screenshots/bookings.png)
+
+#### 🏢 **Resource Management**
+- Add, edit, and remove resources
+- Set resource availability
+- Configure booking rules
+- Manage resource categories
+
+![Resource Management](./screenshots/resources.png)
+
+#### 👥 **User Management**
+- View all registered users
+- Assign and modify user roles
+- Manage user permissions
+- Track user activity
+
+![User Management](./screenshots/users.png)
+
+#### 📣 **Announcements**
+- Create system-wide announcements
+- Schedule announcement visibility
+- Notify all users of important updates
+- Manage announcement priorities
+
+#### 📊 **Statistics & Analytics**
+- Visual representation of booking data
+- Resource utilization metrics
+- Peak usage times analysis
+- Booking trends over time
+- Exportable reports
+
+![Statistics](./screenshots/statistics.png)
+
+### General Features
+
+- **🔐 Authentication**: Secure Firebase authentication with email/password
+- **🎨 Modern UI**: Built with shadcn/ui components and Tailwind CSS
+- **📱 Responsive Design**: Works seamlessly on desktop, tablet, and mobile
+- **🌙 Dark Mode Support**: Eye-friendly interface options
+- **⚡ Real-Time Updates**: Instant synchronization with Firebase Firestore
+- **🔔 Toast Notifications**: User-friendly feedback for all actions
+- **🎯 Role-Based Access Control**: Separate admin and user interfaces
+
+## 📸 Screenshots
+
+> Add your screenshots to a `screenshots/` folder in the project root and they'll appear here!
+
+### Landing Page
+![Landing Page](./screenshots/landing.png)
+
+### Login
+![Login](./screenshots/login.png)
+
+### Signup
+![Signup](./screenshots/signup.png)
+
+## 🛠️ Tech Stack
+
+### Frontend
+- **Framework**: [Next.js 15](https://nextjs.org/) with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **UI Components**: [shadcn/ui](https://ui.shadcn.com/)
+- **Icons**: [Tabler Icons React](https://tabler.io/icons)
+- **Charts**: [Recharts](https://recharts.org/)
+- **Calendar**: [@schedule-x](https://schedule-x.dev/)
+- **Tables**: [TanStack Table](https://tanstack.com/table)
+- **Notifications**: [Sonner](https://sonner.emilkowal.ski/)
+
+### Backend
+- **Database**: [Firebase Firestore](https://firebase.google.com/products/firestore)
+- **Authentication**: [Firebase Auth](https://firebase.google.com/products/auth)
+- **Storage**: Firebase Storage (optional)
+- **API**: Next.js API Routes
+
+### Development Tools
+- **Package Manager**: npm
+- **Build Tool**: Turbopack (Next.js)
+- **Runtime**: Node.js
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- **Node.js** (v18 or higher)
+- **npm** or **yarn**
+- **Firebase Account** with a project created
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/reservo.git
+   cd reservo
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up Firebase**
+   
+   Follow the detailed instructions in [SETUP.md](./SETUP.md) to configure Firebase credentials.
+
+   Quick summary:
+   - Download your Firebase service account JSON
+   - Save it as `firebase/service_account.json`
+   - Copy `.env.example` to `.env.local`
+   - Update environment variables
+
+4. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open your browser**
+   
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+### First Time Setup
+
+After starting the app:
+
+1. Create an account via the signup page
+2. Check the Firebase Console to assign yourself admin role
+3. Or modify `lib/userRoles.ts` to add your email as an admin
+
+## 📁 Project Structure
+
+```
+reservo/
+├── app/                      # Next.js App Router pages
+│   ├── admin/               # Admin-only pages
+│   │   ├── announcements/   # Announcement management
+│   │   ├── bookings/        # Booking approval/management
+│   │   ├── dashboard/       # Admin dashboard
+│   │   ├── resources/       # Resource management
+│   │   ├── statistics/      # Analytics & reports
+│   │   └── users/           # User management
+│   ├── user/                # User pages
+│   │   ├── dashboard/       # User bookings view
+│   │   ├── scheduler/       # Booking interface
+│   │   ├── profile/         # User profile
+│   │   └── contact/         # Contact page
+│   ├── api/                 # API routes
+│   │   ├── bookings/        # Booking CRUD operations
+│   │   ├── availability/    # Check slot availability
+│   │   ├── resources/       # Resource management
+│   │   └── users/           # User operations
+│   ├── login/               # Authentication pages
+│   └── signup/
+├── components/              # React components
+│   ├── ui/                  # shadcn/ui components
+│   ├── app-sidebar.tsx      # Navigation sidebar
+│   ├── calendar.tsx         # Calendar component
+│   ├── data-table.tsx       # Reusable data table
+│   └── ...
+├── firebase/                # Firebase configuration
+│   ├── config.js            # Firebase Admin SDK setup
+│   └── service_account.json # (Not in git - see SETUP.md)
+├── lib/                     # Utility functions
+│   ├── firebase.ts          # Firebase helpers
+│   ├── userRoles.ts         # Role management
+│   └── utils.ts             # General utilities
+└── public/                  # Static assets
+
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 👥 User Roles
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The system supports two primary roles:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Admin
+- Full access to all features
+- Can approve/reject bookings
+- Manage resources and users
+- View analytics and statistics
+- Create announcements
+- Access admin dashboard at `/admin/dashboard`
 
-## Learn More
+### User (Default)
+- Create and manage own bookings
+- View available resources
+- Check real-time availability
+- Cancel own bookings
+- Access user dashboard at `/user/dashboard`
 
-To learn more about Next.js, take a look at the following resources:
+To configure roles, see [ROLE_BASED_AUTH.md](./ROLE_BASED_AUTH.md)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🌐 Deployment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Deploy to Vercel (Recommended)
 
-## Deploy on Vercel
+1. **Push your code to GitHub** (without sensitive files)
+   
+2. **Import project in Vercel**
+   - Go to [vercel.com](https://vercel.com)
+   - Click "New Project"
+   - Import your repository
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3. **Add environment variables**
+   - In Vercel project settings → Environment Variables
+   - Add `FIREBASE_SERVICE_ACCOUNT` with your service account JSON content
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+4. **Deploy!**
+   ```bash
+   vercel --prod
+   ```
+
+For detailed deployment instructions including other platforms, see [SETUP.md](./SETUP.md)
+
+### Environment Variables for Production
+
+```bash
+# Required in production
+FIREBASE_SERVICE_ACCOUNT={"type":"service_account","project_id":"...",...}
+```
+
+## 📖 Documentation
+
+- [Setup Guide](./SETUP.md) - Complete setup instructions
+- [Role-Based Auth](./ROLE_BASED_AUTH.md) - User role configuration
+- [Scheduler Status](./SCHEDULER_STATUS.md) - Booking status reference
+
+## 🔒 Security
+
+- Firebase Authentication for secure user management
+- Role-based access control (RBAC)
+- API route protection
+- Environment variables for sensitive data
+- `.gitignore` configured to exclude credentials
+- Server-side validation for all operations
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📝 License
+
+This project is open source and available under the MIT License.
+
+## 🙋 Support
+
+For issues, questions, or suggestions:
+- Create an issue in this repository
+- Contact the development team
+
+---
+
+**Built with ❤️ using Next.js and Firebase**
