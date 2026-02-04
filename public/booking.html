@@ -1,0 +1,465 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Resource Booking – Firebase Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { --pad: 12px; }
+    body { font-family: system-ui, Arial, sans-serif; margin: 24px; max-width: 1000px; }
+    h1 { margin: 0 0 12px; }
+    .muted { opacity: .7; font-size: .9rem; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    input, select, button, textarea { padding: 8px 10px; border: 1px solid #d0d0d0; border-radius: 8px; }
+    button { cursor: pointer; }
+    button[disabled] { opacity: .6; cursor: not-allowed; }
+    .card { border: 1px solid #eee; border-radius: 12px; padding: var(--pad); margin: 10px 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+    .section-title { margin-top: 18px; }
+    .tag { padding: 2px 8px; border-radius: 999px; border: 1px solid #ddd; font-size: .8rem; }
+    .danger { color: #b00020; }
+    .ok { color: #0a7f2e; }
+    .list { display: grid; gap: 8px; }
+    .flex { display: flex; align-items: center; gap: 8px; }
+    .space { display:flex; justify-content:space-between; align-items:center; }
+  </style>
+</head>
+<body>
+  <h1>Resource Booking</h1>
+  <div id="user" class="muted">Signing in…</div>
+
+  <!-- Resources panel -->
+  <h2 class="section-title">Browse resources</h2>
+  <div class="card">
+    <div class="row">
+      <label>Filter by type:
+        <select id="filterType">
+          <option value="">All</option>
+          <option>Room</option>
+          <option>Lab</option>
+          <option>Equipment</option>
+        </select>
+      </label>
+      <button id="refreshResources">Refresh</button>
+    </div>
+    <div id="resources" class="list" style="margin-top:8px;"></div>
+  </div>
+
+  <!-- Availability + booking form -->
+  <h2 class="section-title">Availability & booking</h2>
+  <div class="card">
+    <div class="row">
+      <label>Resource:
+        <select id="resourceSelect"></select>
+      </label>
+      <label>Date:
+        <input type="date" id="dateInput" />
+      </label>
+      <button id="loadAvailability">View availability</button>
+    </div>
+
+    <div style="margin-top:10px;">
+      <h3>Availability (selected date)</h3>
+      <div id="availability" class="list"></div>
+    </div>
+
+    <div style="margin-top:10px;">
+      <h3>Create booking</h3>
+      <div class="grid">
+        <div class="row">
+          <label>Start time:
+            <input type="time" id="startTime" />
+          </label>
+          <label>End time:
+            <input type="time" id="endTime" />
+          </label>
+        </div>
+        <label style="width:100%;">Purpose:
+          <textarea id="purpose" rows="2" placeholder="Short note…"></textarea>
+        </label>
+      </div>
+      <div class="row" style="margin-top:8px;">
+        <button id="createBooking">Book</button>
+        <span class="muted">Times are in your local timezone.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- My bookings -->
+  <h2 class="section-title">My bookings</h2>
+  <div class="card">
+    <div class="row">
+      <button id="loadMyBookings">Refresh</button>
+    </div>
+    <h3>Upcoming</h3>
+    <div id="myUpcoming" class="list"></div>
+    <h3 style="margin-top:10px;">Past</h3>
+    <div id="myPast" class="list"></div>
+  </div>
+
+  <!-- Firebase & App -->
+  <script type="module">
+    // 1) Firebase config — paste yours here
+    
+  const firebaseConfig = {
+  apiKey: "AIzaSyC7lVx2xN1VHvYsOyp5D5aLfqHO3xcAF68",
+  authDomain: "soen-287-project-794db.firebaseapp.com",
+  projectId: "soen-287-project-794db",
+  storageBucket: "soen-287-project-794db.firebasestorage.app",
+  messagingSenderId: "219613651385",
+  appId: "1:219613651385:web:73cb0421bfff7f95335668",
+  measurementId: "G-ERS0795T8T"
+};
+
+
+    // 2) SDK imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import {
+      getFirestore, collection, doc, addDoc, getDoc, getDocs, onSnapshot,
+      query, where, orderBy, limit, runTransaction, serverTimestamp, Timestamp
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    // 3) Init
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Elements
+    const userDiv = document.getElementById("user");
+    const resourcesDiv = document.getElementById("resources");
+    const filterTypeSel = document.getElementById("filterType");
+    const refreshResourcesBtn = document.getElementById("refreshResources");
+    const resourceSelect = document.getElementById("resourceSelect");
+    const dateInput = document.getElementById("dateInput");
+    const availabilityDiv = document.getElementById("availability");
+    const startTimeInput = document.getElementById("startTime");
+    const endTimeInput = document.getElementById("endTime");
+    const purposeInput = document.getElementById("purpose");
+    const createBookingBtn = document.getElementById("createBooking");
+    const loadAvailabilityBtn = document.getElementById("loadAvailability");
+    const loadMyBookingsBtn = document.getElementById("loadMyBookings");
+    const myUpcomingDiv = document.getElementById("myUpcoming");
+    const myPastDiv = document.getElementById("myPast");
+
+    // Auth (anonymous for demo)
+    let currentUid = null;
+    signInAnonymously(auth).catch(console.error);
+    onAuthStateChanged(auth, (u) => {
+      currentUid = u?.uid || null;
+      userDiv.textContent = currentUid
+        ? `Signed in as: ${currentUid.slice(0,8)}… (anonymous)`
+        : "Not signed in";
+    });
+
+    // Helpers
+    const resourcesRef = collection(db, "resources"); // {name,type,location?}
+    const bookingsRef  = collection(db, "bookings");  // {resourceId,userId,start,end,purpose,resourceName,createdAt}
+
+    function toISODateOnly(d) { return d.toISOString().slice(0,10); }
+    function combineLocalDateTime(dateStr, timeStr) {
+      // Create a Date from local date & time (no timezone math)
+      const [y,m,d] = dateStr.split("-").map(Number);
+      const [hh,mm] = timeStr.split(":").map(Number);
+      return new Date(y, (m-1), d, hh, mm, 0, 0);
+    }
+    function fmt(dt) { return dt.toLocaleString(); }
+    function fmtHM(dt) { return dt.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
+
+    // Seed example resources if empty (optional helper)
+    async function ensureSampleResources() {
+      const snap = await getDocs(query(resourcesRef, limit(1)));
+      if (!snap.empty) return;
+      await addDoc(resourcesRef, { name: "Room A", type: "Room", location: "1st floor" });
+      await addDoc(resourcesRef, { name: "Room B", type: "Room", location: "2nd floor" });
+      await addDoc(resourcesRef, { name: "Microscope 1", type: "Equipment", location: "Lab 12" });
+    }
+
+    // UI: list resources
+    async function loadResources() {
+      const typeFilter = filterTypeSel.value;
+      const q = typeFilter
+        ? query(resourcesRef, where("type","==", typeFilter), orderBy("name"))
+        : query(resourcesRef, orderBy("name"));
+      const snap = await getDocs(q);
+
+      resourcesDiv.innerHTML = "";
+      resourceSelect.innerHTML = "";
+      snap.forEach(d => {
+        const r = d.data();
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="space">
+            <div>
+              <div><strong>${r.name}</strong> <span class="tag">${r.type || "Resource"}</span></div>
+              <div class="muted">${r.location || ""}</div>
+            </div>
+            <button>Use in form</button>
+          </div>
+        `;
+        card.querySelector("button").onclick = () => {
+          resourceSelect.value = d.id;
+        };
+        resourcesDiv.appendChild(card);
+
+        const opt = document.createElement("option");
+        opt.value = d.id;
+        opt.textContent = r.name;
+        resourceSelect.appendChild(opt);
+      });
+
+      // Choose first by default
+      if (resourceSelect.options.length && !resourceSelect.value) {
+        resourceSelect.value = resourceSelect.options[0].value;
+      }
+    }
+
+    // Availability for a resource on a date
+    let availabilityUnsub = null;
+    async function loadAvailability() {
+      if (availabilityUnsub) { availabilityUnsub(); availabilityUnsub = null; }
+      availabilityDiv.innerHTML = "";
+
+      const resourceId = resourceSelect.value;
+      const dateStr = dateInput.value || toISODateOnly(new Date());
+      dateInput.value = dateStr;
+
+      // day range: [startOfDay, endOfDay)
+      const dayStart = new Date(dateStr + "T00:00:00");
+      const nextDay = new Date(dayStart.getTime() + 24*3600*1000);
+
+      // We want bookings overlapping the day. For display, fetching those with start < nextDay AND end > dayStart
+      const qDay = query(
+        bookingsRef,
+        where("resourceId","==", resourceId),
+        where("start","<", Timestamp.fromDate(nextDay)),
+        where("end",">",  Timestamp.fromDate(dayStart)),
+        orderBy("start","asc")
+      );
+
+      availabilityUnsub = onSnapshot(qDay, (snap) => {
+        availabilityDiv.innerHTML = "";
+        if (snap.empty) {
+          availabilityDiv.innerHTML = `<div class="muted">No bookings for this date — fully available.</div>`;
+          return;
+        }
+        snap.forEach(d => {
+          const b = d.data();
+          const start = b.start.toDate();
+          const end   = b.end.toDate();
+          const mine  = b.userId === currentUid;
+
+          const item = document.createElement("div");
+          item.className = "card";
+          item.innerHTML = `
+            <div class="space">
+              <div>
+                <div><strong>${fmtHM(start)}–${fmtHM(end)}</strong> — ${b.purpose || "(no purpose)"}</div>
+                <div class="muted">by ${mine ? "you" : (b.userId.slice(0,8)+"…")}</div>
+              </div>
+              <div class="row">
+                <button ${mine ? "" : "disabled"} data-id="${d.id}" class="editBtn">Edit</button>
+                <button ${mine ? "" : "disabled"} data-id="${d.id}" class="cancelBtn danger">Cancel</button>
+              </div>
+            </div>
+          `;
+          availabilityDiv.appendChild(item);
+        });
+
+        // Wire edit/cancel buttons
+        availabilityDiv.querySelectorAll(".cancelBtn").forEach(btn => {
+          btn.onclick = async () => {
+            const id = btn.getAttribute("data-id");
+            if (!confirm("Cancel this booking?")) return;
+            await cancelBooking(id);
+          };
+        });
+        availabilityDiv.querySelectorAll(".editBtn").forEach(btn => {
+          btn.onclick = async () => {
+            const id = btn.getAttribute("data-id");
+            await promptEditBooking(id);
+          };
+        });
+      });
+    }
+
+    // Create a booking (with overlap check)
+    async function createBooking() {
+      if (!currentUid) return alert("Not signed in.");
+
+      const resourceId = resourceSelect.value;
+      if (!resourceId) return alert("Select a resource.");
+
+      const dateStr = dateInput.value;
+      const startStr = startTimeInput.value;
+      const endStr = endTimeInput.value;
+      if (!dateStr || !startStr || !endStr) return alert("Pick date, start, and end times.");
+
+      const start = combineLocalDateTime(dateStr, startStr);
+      const end   = combineLocalDateTime(dateStr, endStr);
+      if (!(end > start)) return alert("End must be after start.");
+
+      // For display: resourceName
+      const rDoc = await getDoc(doc(db, "resources", resourceId));
+      const resourceName = rDoc.exists() ? rDoc.data().name : "(resource)";
+
+      // Transaction: ensure no overlap with existing bookings for the same resource
+      // NOTE: Firestore can't *guarantee* global no-overlap at rules level; for production, enforce on server (Cloud Functions).
+      await runTransaction(db, async (tx) => {
+        // fetch overlapping
+        const dayStart = new Date(start); dayStart.setHours(0,0,0,0);
+        const nextDay  = new Date(dayStart.getTime() + 24*3600*1000);
+        const qOver = query(
+          bookingsRef,
+          where("resourceId","==", resourceId),
+          where("start","<", Timestamp.fromDate(end)),
+          where("end",">",  Timestamp.fromDate(start))
+        );
+        const snap = await getDocs(qOver);
+        if (!snap.empty) throw new Error("Time slot overlaps an existing booking.");
+
+        await addDoc(bookingsRef, {
+          resourceId,
+          resourceName,
+          userId: currentUid,
+          start: Timestamp.fromDate(start),
+          end:   Timestamp.fromDate(end),
+          purpose: (purposeInput.value || "").trim(),
+          createdAt: serverTimestamp(),
+        });
+      });
+
+      alert("Booked!");
+      purposeInput.value = "";
+    }
+
+    // Cancel booking (only owner)
+    async function cancelBooking(bookingId) {
+      await runTransaction(db, async (tx) => {
+        const ref = doc(db, "bookings", bookingId);
+        const s = await tx.get(ref);
+        if (!s.exists()) throw new Error("Booking not found.");
+        const b = s.data();
+        if (b.userId !== currentUid) throw new Error("You can cancel only your own booking.");
+        tx.delete(ref);
+      });
+    }
+
+    // Edit booking (change time/purpose)
+    async function promptEditBooking(bookingId) {
+      const ref = doc(db, "bookings", bookingId);
+      const s = await getDoc(ref);
+      if (!s.exists()) return alert("Booking not found.");
+      const b = s.data();
+      if (b.userId !== currentUid) return alert("You can edit only your own booking.");
+
+      const startOld = b.start.toDate();
+      const endOld   = b.end.toDate();
+      const purposeOld = b.purpose || "";
+
+      const newStartStr = prompt("New start (HH:MM)", fmtHM(startOld));
+      if (!newStartStr) return;
+      const newEndStr   = prompt("New end (HH:MM)", fmtHM(endOld));
+      if (!newEndStr) return;
+      const newPurpose  = prompt("Purpose", purposeOld) ?? purposeOld;
+
+      // Use the same date the booking is on
+      const dateStr = toISODateOnly(startOld);
+      const newStart = combineLocalDateTime(dateStr, newStartStr);
+      const newEnd   = combineLocalDateTime(dateStr, newEndStr);
+      if (!(newEnd > newStart)) return alert("End must be after start.");
+
+      await runTransaction(db, async (tx) => {
+        const s2 = await tx.get(ref);
+        if (!s2.exists()) throw new Error("Booking not found.");
+        const bb = s2.data();
+        if (bb.userId !== currentUid) throw new Error("You can edit only your own booking.");
+
+        // Overlap check again for the same resource, excluding this booking
+        const qOver = query(
+          bookingsRef,
+          where("resourceId","==", bb.resourceId),
+          where("start","<", Timestamp.fromDate(newEnd)),
+          where("end",">",  Timestamp.fromDate(newStart))
+        );
+        const snap = await getDocs(qOver);
+        const conflict = snap.docs.some(d => d.id !== bookingId);
+        if (conflict) throw new Error("New time overlaps another booking.");
+
+        tx.update(ref, {
+          start: Timestamp.fromDate(newStart),
+          end:   Timestamp.fromDate(newEnd),
+          purpose: newPurpose,
+        });
+      });
+    }
+
+    // My bookings: upcoming/past
+    let myUnsub = null;
+    async function loadMyBookings() {
+      if (!currentUid) return alert("Not signed in yet.");
+      if (myUnsub) { myUnsub(); myUnsub = null; }
+      myUpcomingDiv.innerHTML = "";
+      myPastDiv.innerHTML = "";
+
+      const nowTs = Timestamp.fromDate(new Date());
+      // Listen to my bookings in time order
+      const qMine = query(bookingsRef, where("userId","==", currentUid), orderBy("start","asc"));
+      myUnsub = onSnapshot(qMine, (snap) => {
+        myUpcomingDiv.innerHTML = "";
+        myPastDiv.innerHTML = "";
+        const now = new Date();
+
+        snap.forEach(d => {
+          const b = d.data();
+          const start = b.start.toDate();
+          const end   = b.end.toDate();
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <div class="space">
+              <div>
+                <div><strong>${b.resourceName || b.resourceId}</strong></div>
+                <div class="muted">${toISODateOnly(start)} — ${fmtHM(start)}–${fmtHM(end)}</div>
+                <div>${b.purpose || ""}</div>
+              </div>
+              <div class="row">
+                <button data-id="${d.id}" class="editMine">Edit</button>
+                <button data-id="${d.id}" class="cancelMine danger">Cancel</button>
+              </div>
+            </div>
+          `;
+          (end >= now ? myUpcomingDiv : myPastDiv).appendChild(card);
+        });
+
+        myUpcomingDiv.querySelectorAll(".cancelMine").forEach(btn => {
+          btn.onclick = () => cancelBooking(btn.getAttribute("data-id"));
+        });
+        myUpcomingDiv.querySelectorAll(".editMine").forEach(btn => {
+          btn.onclick = () => promptEditBooking(btn.getAttribute("data-id"));
+        });
+      });
+    }
+
+    // Wire buttons
+    refreshResourcesBtn.onclick = loadResources;
+    loadAvailabilityBtn.onclick = loadAvailability;
+    createBookingBtn.onclick = createBooking;
+    loadMyBookingsBtn.onclick = loadMyBookings;
+
+    // Defaults
+    dateInput.value = toISODateOnly(new Date());
+    startTimeInput.value = "09:00";
+    endTimeInput.value   = "10:00";
+
+    // First load
+    await ensureSampleResources();
+    await loadResources();
+    await loadAvailability();
+    // My bookings will work once auth finishes
+    setTimeout(loadMyBookings, 800);
+  </script>
+</body>
+</html>
