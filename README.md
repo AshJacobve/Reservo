@@ -1,21 +1,12 @@
 # Reservo - Resource Booking & Management System
 
+<img width="2834" height="1284" alt="Screenshot 2026-02-03 225436" src="https://github.com/user-attachments/assets/5986bd99-94af-4213-8b8a-b036ca77ef84" />
+
 A comprehensive web-based resource booking and management platform built with Next.js, Firebase, and modern UI components. This system enables organizations to efficiently manage resource reservations with role-based access control.
 
-![Reservo Banner](./screenshots/hero.png)
+ 
 
-## 📋 Table of Contents
-
-- [Overview](#overview)
-- [Key Features](#key-features)
-- [Screenshots](#screenshots)
-- [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
-- [Project Structure](#project-structure)
-- [User Roles](#user-roles)
-- [Deployment](#deployment)
-
-## 🎯 Overview
+##  Overview
 
 **Reservo** is a full-stack booking management system designed for educational institutions, organizations, or any entity that needs to manage shared resources. The platform features separate interfaces for administrators and regular users, providing comprehensive booking management, real-time availability checking, and detailed analytics.
 
@@ -29,106 +20,95 @@ A comprehensive web-based resource booking and management platform built with Ne
 - **Announcements**: System-wide notifications for users
 - **Role-Based Access**: Separate dashboards for administrators and regular users
 
-## ✨ Key Features
+## Key Features
 
 ### For Users
 
-#### 🗓️ **Interactive Scheduler**
+<img width="2842" height="1493" alt="Screenshot 2026-02-03 225521" src="https://github.com/user-attachments/assets/f8385909-bb28-495e-87b6-65ecfc90b59a" />
+
+
+####  **Interactive Scheduler**
 - Visual calendar interface for booking resources
 - Real-time availability checking
 - Select time slots (9 AM - 5 PM in 1-hour intervals)
 - Add purpose/notes to bookings
 - Instant booking confirmation
 
-![Scheduler Interface](./screenshots/scheduler.png)
 
-#### 📊 **User Dashboard**
+####  **User Dashboard**
 - View all your bookings in one place
 - Track booking status (pending, accepted, rejected, cancelled)
 - Cancel bookings when needed
 - Filter between upcoming and past bookings
 - Detailed booking information cards
+- 
+<img width="2855" height="1504" alt="Screenshot 2026-02-03 225546" src="https://github.com/user-attachments/assets/ca32a354-d6b3-46cc-b186-9264b6ae3a51" />
 
-![User Dashboard](./screenshots/user-dashboard.png)
 
-#### 👤 **Profile Management**
+####  **Profile Management**
 - Update personal information
 - View account details
 - Manage contact preferences
 
 ### For Administrators
 
-#### 📈 **Admin Dashboard**
+<img width="2828" height="1506" alt="Screenshot 2026-02-03 225558" src="https://github.com/user-attachments/assets/d9477769-f6fe-4f3f-b94a-7c2b074d036e" />
+
+
+####  **Admin Dashboard**
 - Overview of all bookings with statistics
 - Interactive charts showing booking trends
 - Recent bookings at a glance
 - Quick access to key metrics
 - Real-time data visualization
 
-![Admin Dashboard](./screenshots/admin-dashboard.png)
 
-#### ✅ **Booking Management**
+#### **Booking Management**
 - Approve or reject booking requests
 - View detailed booking information
 - Filter and search bookings
 - Manage booking statuses
 - Export booking data
 
-![Booking Management](./screenshots/bookings.png)
 
-#### 🏢 **Resource Management**
+
+#### **Resource Management**
 - Add, edit, and remove resources
 - Set resource availability
 - Configure booking rules
 - Manage resource categories
 
-![Resource Management](./screenshots/resources.png)
 
-#### 👥 **User Management**
+#### **User Management**
 - View all registered users
 - Assign and modify user roles
 - Manage user permissions
 - Track user activity
 
-![User Management](./screenshots/users.png)
 
-#### 📣 **Announcements**
+#### **Announcements**
 - Create system-wide announcements
 - Schedule announcement visibility
 - Notify all users of important updates
 - Manage announcement priorities
 
-#### 📊 **Statistics & Analytics**
+#### **Statistics & Analytics**
 - Visual representation of booking data
 - Resource utilization metrics
 - Peak usage times analysis
 - Booking trends over time
 - Exportable reports
 
-![Statistics](./screenshots/statistics.png)
 
 ### General Features
 
-- **🔐 Authentication**: Secure Firebase authentication with email/password
-- **🎨 Modern UI**: Built with shadcn/ui components and Tailwind CSS
-- **📱 Responsive Design**: Works seamlessly on desktop, tablet, and mobile
-- **🌙 Dark Mode Support**: Eye-friendly interface options
-- **⚡ Real-Time Updates**: Instant synchronization with Firebase Firestore
-- **🔔 Toast Notifications**: User-friendly feedback for all actions
-- **🎯 Role-Based Access Control**: Separate admin and user interfaces
-
-## 📸 Screenshots
-
-> Add your screenshots to a `screenshots/` folder in the project root and they'll appear here!
-
-### Landing Page
-![Landing Page](./screenshots/landing.png)
-
-### Login
-![Login](./screenshots/login.png)
-
-### Signup
-![Signup](./screenshots/signup.png)
+- ** Authentication**: Secure Firebase authentication with email/password
+- ** Modern UI**: Built with shadcn/ui components and Tailwind CSS
+- ** Responsive Design**: Works seamlessly on desktop, tablet, and mobile
+- ** Dark Mode Support**: Eye-friendly interface options
+- ** Real-Time Updates**: Instant synchronization with Firebase Firestore
+- ** Toast Notifications**: User-friendly feedback for all actions
+- ** Role-Based Access Control**: Separate admin and user interfaces
 
 ## 🛠️ Tech Stack
 
@@ -293,13 +273,7 @@ For detailed deployment instructions including other platforms, see [SETUP.md](.
 FIREBASE_SERVICE_ACCOUNT={"type":"service_account","project_id":"...",...}
 ```
 
-## 📖 Documentation
-
-- [Setup Guide](./SETUP.md) - Complete setup instructions
-- [Role-Based Auth](./ROLE_BASED_AUTH.md) - User role configuration
-- [Scheduler Status](./SCHEDULER_STATUS.md) - Booking status reference
-
-## 🔒 Security
+##  Security
 
 - Firebase Authentication for secure user management
 - Role-based access control (RBAC)
@@ -308,15 +282,15 @@ FIREBASE_SERVICE_ACCOUNT={"type":"service_account","project_id":"...",...}
 - `.gitignore` configured to exclude credentials
 - Server-side validation for all operations
 
-## 🤝 Contributing
+##  Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📝 License
+##  License
 
 This project is open source and available under the MIT License.
 
-## 🙋 Support
+##  Support
 
 For issues, questions, or suggestions:
 - Create an issue in this repository
